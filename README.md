@@ -24,4 +24,4 @@ When you first launch the app, Music Assistant may hide the new player by defaul
 ## ☕ Support the Project
 If this app made your home theater experience better, consider buying me a coffee! 
 
-[![Ko-fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/zonya)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/zonya2026)
