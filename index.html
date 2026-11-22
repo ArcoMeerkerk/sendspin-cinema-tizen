@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,7 +34,8 @@
 
         #controls-container { position: fixed; bottom: -200px; left: 0; width: 100%; height: 200px; display: flex; justify-content: center; align-items: center; background: linear-gradient(to top, #000, transparent); transition: bottom 0.5s ease; z-index: 100; }
         .btn { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); color: #fff; width: 85px; height: 85px; border-radius: 50%; margin: 0 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; font-size: 2rem; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
-        .btn:hover { background: var(--accent); transform: scale(1.1); }
+        .btn:hover, .btn:focus { background: var(--accent); transform: scale(1.1); outline: none; }
+        #settings-trigger:focus { background: var(--accent); outline: none; }
 
         body.show-ui { cursor: default; }
         body.show-ui #controls-container { bottom: 0; }
@@ -47,24 +48,28 @@
         #setup-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; display: none; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(30px); }
         .input-group { width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 25px; }
         input { background: none; border: none; border-bottom: 2px solid var(--accent); color: #fff; font-size: 3rem; text-align: center; width: 60%; padding: 15px; outline: none; font-family: monospace; }
+        input:focus { border-bottom-color: #fff; }
         input::placeholder { color: rgba(255,255,255,0.1); }
+        .btn-save { background: var(--glass); border: 2px solid rgba(255,255,255,0.2); color: #fff; font-size: 2rem; padding: 15px 60px; border-radius: 40px; cursor: pointer; outline: none; font-family: inherit; }
+        .btn-save:focus { background: var(--accent); border-color: #fff; }
         .setup-hint { margin-top: 30px; color: #555; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; }
     </style>
 </head>
 <body id="main-body">
 
-    <div id="settings-trigger" onclick="openSettings()">
+    <div id="settings-trigger" tabindex="0" onclick="openSettings()">
         <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.81,11.69,4.81,12c0,0.31,0.02,0.65,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
     </div>
 
     <div id="setup-screen">
         <div class="input-group">
-            <input type="text" id="server-ip" placeholder="192.168.1.20" onkeydown="if(event.key==='Enter') document.getElementById('player-name').focus()">
+            <input type="text" id="server-ip" placeholder="192.168.1.20">
         </div>
         <div class="input-group">
-            <input type="text" id="player-name" placeholder="Player Name" onkeydown="if(event.key==='Enter') saveConfig()">
+            <input type="text" id="player-name" data-i18n-placeholder="playerName">
         </div>
-        <div class="setup-hint">Unesi podatke i pritisni Enter na drugom polju</div>
+        <button class="btn-save" id="save-btn" data-i18n="save"></button>
+        <div class="setup-hint" data-i18n="hint"></div>
     </div>
 
     <div id="bg-overlay"></div>
@@ -81,7 +86,7 @@
             <div class="progress-container"><div id="progress-bar"></div></div>
             <span class="time-label" id="time-total">0:00</span>
         </div>
-        <h1 id="title">Učitavanje...</h1>
+        <h1 id="title" data-i18n="loading"></h1>
         <h2 id="artist">Cinema Player</h2>
     </div>
 
@@ -93,6 +98,36 @@
 
     <script type="module">
         import { SendspinPlayer } from './sendspin-lib.js';
+
+        const I18N = {
+            en: { loading: 'Loading...', ready: 'Ready', playerName: 'Player Name', save: 'Save', hint: 'Use ▲▼ to switch fields, OK to type, then select Save' },
+            nl: { loading: 'Laden...', ready: 'Klaar', playerName: 'Spelernaam', save: 'Opslaan', hint: 'Gebruik ▲▼ om van veld te wisselen, OK om te typen en kies daarna Opslaan' },
+            de: { loading: 'Wird geladen...', ready: 'Bereit', playerName: 'Playername', save: 'Speichern', hint: 'Mit ▲▼ das Feld wechseln, mit OK eingeben und dann Speichern wählen' },
+            fr: { loading: 'Chargement...', ready: 'Prêt', playerName: 'Nom du lecteur', save: 'Enregistrer', hint: 'Utilisez ▲▼ pour changer de champ, OK pour saisir, puis choisissez Enregistrer' },
+            es: { loading: 'Cargando...', ready: 'Listo', playerName: 'Nombre del reproductor', save: 'Guardar', hint: 'Usa ▲▼ para cambiar de campo, OK para escribir y luego elige Guardar' },
+            sr: { loading: 'Učitavanje...', ready: 'Spreman', playerName: 'Ime plejera', save: 'Sačuvaj', hint: 'Koristi ▲▼ za promenu polja, OK za unos, zatim izaberi Sačuvaj' }
+        };
+        const systemLang = ((navigator.languages && navigator.languages[0]) || navigator.language || 'en').toLowerCase().split(/[-_]/)[0];
+        const dict = I18N[systemLang] || I18N.en;
+        const t = (key) => dict[key] || I18N.en[key];
+
+        document.documentElement.lang = I18N[systemLang] ? systemLang : 'en';
+        document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+
+        const KEY_IME_DONE = 65376, KEY_BACK = 10009;
+        const MEDIA_COMMANDS = { 415: 'play', 19: 'pause', 10252: 'playpause', 10233: 'next', 10232: 'previous' };
+
+        const setupScreen = document.getElementById('setup-screen');
+        const ipInput = document.getElementById('server-ip');
+        const nameInput = document.getElementById('player-name');
+        const saveBtn = document.getElementById('save-btn');
+        const settingsBtn = document.getElementById('settings-trigger');
+        const prevBtn = document.getElementById('prev-btn');
+        const playBtn = document.getElementById('play-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const setupFields = [ipInput, nameInput, saveBtn];
+        const controlRow = [prevBtn, playBtn, nextBtn];
 
         const titleEl = document.getElementById('title');
         const artistEl = document.getElementById('artist');
@@ -125,15 +160,20 @@
         }
 
         window.openSettings = () => {
-            document.getElementById('setup-screen').style.display = 'flex';
-            document.getElementById('server-ip').value = localStorage.getItem('ma_server_ip') || '';
-            document.getElementById('player-name').value = localStorage.getItem('ma_player_name') || '';
-            document.getElementById('server-ip').focus();
+            setupScreen.style.display = 'flex';
+            ipInput.value = localStorage.getItem('ma_server_ip') || '';
+            nameInput.value = localStorage.getItem('ma_player_name') || '';
+            ipInput.focus();
         };
 
+        function closeSettings() {
+            setupScreen.style.display = 'none';
+            playBtn.focus();
+        }
+
         window.saveConfig = () => {
-            const ip = document.getElementById('server-ip').value.trim();
-            const name = document.getElementById('player-name').value.trim() || 'LG Cinema TV';
+            const ip = ipInput.value.trim();
+            const name = nameInput.value.trim() || 'LG Cinema TV';
             if (ip) { 
                 localStorage.setItem('ma_server_ip', ip); 
                 localStorage.setItem('ma_player_name', name);
@@ -157,7 +197,7 @@
                 onStateChange: (state) => {
                     if (state.serverState?.metadata) {
                         const m = state.serverState.metadata;
-                        titleEl.innerText = m.title || "Spreman";
+                        titleEl.innerText = m.title || t('ready');
                         artistEl.innerText = m.artist || "Music Assistant";
                         const art = m.artwork_url || m.art || m.image;
                         if (art && coverEl.src !== art) {
@@ -188,8 +228,63 @@
             uiTimeout = setTimeout(() => document.getElementById('main-body').classList.remove('show-ui'), 5000);
         }
 
+        function move(list, from, step) {
+            const next = list[Math.max(0, Math.min(list.length - 1, from + step))];
+            if (next) next.focus();
+        }
+
+        // The TV on-screen keyboard "Done" key arrives as keyCode 65376, not Enter, and OK/Enter on an input opens the keyboard.
+        function onSetupKey(e) {
+            const i = setupFields.indexOf(document.activeElement);
+            if (e.keyCode === KEY_IME_DONE || e.key === 'ArrowDown') {
+                e.preventDefault();
+                move(setupFields, i, 1);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                move(setupFields, i, -1);
+            } else if ((e.key === 'Enter' || e.keyCode === 13) && document.activeElement === saveBtn) {
+                e.preventDefault();
+                window.saveConfig();
+            } else if ((e.keyCode === KEY_BACK || e.key === 'Escape') && localStorage.getItem('ma_server_ip')) {
+                closeSettings();
+            }
+        }
+
+        function onPlayerKey(e) {
+            const body = document.getElementById('main-body');
+            const wasHidden = !body.classList.contains('show-ui');
+            showUI();
+
+            const media = MEDIA_COMMANDS[e.keyCode];
+            if (media) {
+                const command = media === 'playpause' ? (isPlaying ? 'pause' : 'play') : media;
+                window.playerInstance?.sendCommand(command);
+                return;
+            }
+
+            const active = document.activeElement;
+            const row = controlRow.indexOf(active);
+            if (wasHidden && row === -1 && active !== settingsBtn) {
+                playBtn.focus();
+            } else if (e.key === 'ArrowLeft' && row !== -1) {
+                move(controlRow, row, -1);
+            } else if (e.key === 'ArrowRight' && row !== -1) {
+                move(controlRow, row, 1);
+            } else if (e.key === 'ArrowUp' && row !== -1) {
+                settingsBtn.focus();
+            } else if (e.key === 'ArrowDown' && active === settingsBtn) {
+                playBtn.focus();
+            } else if ((e.key === 'Enter' || e.keyCode === 13) && active === settingsBtn) {
+                window.openSettings();
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (setupScreen.style.display === 'flex') onSetupKey(e);
+            else onPlayerKey(e);
+        });
         window.addEventListener('mousemove', showUI);
-        window.addEventListener('keydown', showUI);
+        saveBtn.onclick = () => window.saveConfig();
         document.getElementById('play-btn').onclick = () => window.playerInstance?.sendCommand(isPlaying ? 'pause' : 'play');
         document.getElementById('prev-btn').onclick = () => window.playerInstance?.sendCommand('previous');
         document.getElementById('next-btn').onclick = () => window.playerInstance?.sendCommand('next');

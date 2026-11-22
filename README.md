@@ -6,6 +6,8 @@ A beautiful, minimalistic, cinema-inspired web player for **Music Assistant**. T
 * **Cinema Aesthetic:** Dark, immersive background with a glowing progress bar.
 * **Dynamic Colors:** Automatically extracts the dominant color from the album art and adapts the UI accent color (powered by Vibrant.js).
 * **Plug & Play:** Easy setup right from the TV screen.
+* **Remote control friendly:** Navigate with the arrow keys and OK, use the media keys (play/pause/next/previous), and press **▲** on the player controls to reach the settings (gear) button. **Return** closes the settings screen.
+* **Multilingual:** The UI follows the TV's system language: English, Nederlands, Deutsch, Français, Español and Srpski (English is the fallback).
 
 ## 🚀 Installation Guide
 
@@ -29,7 +31,7 @@ This repository is a TizenBrew *application module* (see `package.json`). Nothin
 
 **3. Launch it**
 1. Go back to the TizenBrew home screen (house icon) and select **Sendspin Cinema**.
-2. On first launch enter the IP address of your Music Assistant server and a player name, then press **Enter** on the second field. These values are stored on the TV.
+2. On first launch enter the IP address of your Music Assistant server and a player name with the remote: press **OK** on a field to open the on-screen keyboard, press **Done** on the keyboard, then use **▲/▼** to move to the next field and finally select **Save**. These values are stored on the TV.
 3. Optional: in TizenBrew **Settings** -> **Autolaunch Settings** you can pick Sendspin Cinema to start automatically whenever TizenBrew is opened.
 
 **Updating / removing**
