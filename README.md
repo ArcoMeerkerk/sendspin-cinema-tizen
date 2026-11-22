@@ -8,7 +8,17 @@ A beautiful, minimalistic, cinema-inspired web player for **Music Assistant**. T
 * **Plug & Play:** Easy setup right from the TV screen.
 
 ## 🚀 Installation Guide
-Because this is a custom web application, it must be packaged and installed using Tizen Studio tools.
+
+### Option A: TizenBrew module (no Tizen Studio needed)
+1. Install [TizenBrew](https://github.com/reisxd/TizenBrew) on your TV.
+2. In TizenBrew, go to **Module Manager** -> **Add GitHub Module**.
+3. Enter `ArcoMeerkerk/sendspin-cinema-tizen` (use your own `user/repo` if you forked it).
+4. Start **Sendspin Cinema** from the TizenBrew module list.
+
+TizenBrew loads the module through jsDelivr, so it must be a public repository. Changes to the default branch can take a while to show up because of CDN caching; publishing a release/tag avoids this.
+
+### Option B: Standalone `.wgt`
+Because this is a custom web application, it can also be packaged and installed using Tizen Studio tools.
 
 1. Ensure your Samsung TV is in **Developer Mode** and connected to your local network.
 2. Build the signed `.wgt` package using the Tizen CLI or Tizen Studio IDE.

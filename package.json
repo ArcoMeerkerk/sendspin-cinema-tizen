@@ -1,0 +1,21 @@
+{
+  "name": "sendspin-cinema-tizen",
+  "version": "1.0.0",
+  "description": "Cinema-style Sendspin / Music Assistant player for Samsung Tizen TVs",
+  "packageType": "app",
+  "appName": "Sendspin Cinema",
+  "appPath": "index.html",
+  "keys": [
+    "MediaPlay",
+    "MediaPause",
+    "MediaPlayPause",
+    "MediaStop",
+    "MediaTrackPrevious",
+    "MediaTrackNext"
+  ],
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArcoMeerkerk/sendspin-cinema-tizen.git"
+  }
+}
