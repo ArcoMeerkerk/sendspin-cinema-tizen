@@ -10,12 +10,31 @@ A beautiful, minimalistic, cinema-inspired web player for **Music Assistant**. T
 ## 🚀 Installation Guide
 
 ### Option A: TizenBrew module (no Tizen Studio needed)
-1. Install [TizenBrew](https://github.com/reisxd/TizenBrew) on your TV.
-2. In TizenBrew, go to **Module Manager** -> **Add GitHub Module**.
-3. Enter `ArcoMeerkerk/sendspin-cinema-tizen` (use your own `user/repo` if you forked it).
-4. Start **Sendspin Cinema** from the TizenBrew module list.
+This repository is a TizenBrew *application module* (see `package.json`). Nothing is installed on the TV itself: [TizenBrew](https://github.com/reisxd/TizenBrew) downloads the files from this GitHub repository through the jsDelivr CDN every time you launch it, so the TV needs internet access and the repository must be public.
 
-TizenBrew loads the module through jsDelivr, so it must be a public repository. Changes to the default branch can take a while to show up because of CDN caching; publishing a release/tag avoids this.
+**Requirements:** a Samsung TV from 2017 or newer (Tizen 3.0+) and TizenBrew installed on it. If you don't have TizenBrew yet, follow the [official TizenBrew guide](https://github.com/reisxd/TizenBrew/blob/main/docs/README.md) (preferred method: TizenBrew Installer Desktop).
+
+**1. Set up the TV for TizenBrew** (only if you haven't already)
+1. On the TV open **Apps** and enter `12345` with the remote.
+2. Switch **Developer mode** to **On**.
+3. While installing TizenBrew from your PC, set **Host PC IP** to your PC's IP address.
+4. After TizenBrew is installed, set **Host PC IP** to `127.0.0.1`, press **OK** and fully restart the TV (hold the power button until you see the Samsung logo). TizenBrew cannot launch modules until this is done.
+
+**2. Add the module**
+1. Open **TizenBrew** on the TV.
+2. Open the **Module Manager** (the archive-box icon at the top right, or the GREEN button on the remote).
+3. Choose **Add GitHub Module**.
+4. Type `ArcoMeerkerk/sendspin-cinema-tizen` (just `user/repo`, TizenBrew adds the `gh/` prefix itself; use your own `user/repo` if you forked this project).
+5. Confirm the input and leave the text field (for example press **Enter** on the on-screen keyboard and then **Return**). The module is added when the field loses focus, and **Sendspin Cinema** should now appear in the Module Manager. If it is listed as *Unknown Module*, the name is wrong or the repository is not public.
+
+**3. Launch it**
+1. Go back to the TizenBrew home screen (house icon) and select **Sendspin Cinema**.
+2. On first launch enter the IP address of your Music Assistant server and a player name, then press **Enter** on the second field. These values are stored on the TV.
+3. Optional: in TizenBrew **Settings** -> **Autolaunch Settings** you can pick Sendspin Cinema to start automatically whenever TizenBrew is opened.
+
+**Updating / removing**
+* Updates are picked up automatically; jsDelivr caches the default branch for up to 12 hours. Don't publish GitHub releases/tags unless you want to pin a version: once a release exists, jsDelivr serves the latest release instead of the branch and caches that for up to 7 days.
+* To remove the module, select it in the **Module Manager** and confirm the prompt.
 
 ### Option B: Standalone `.wgt`
 Because this is a custom web application, it can also be packaged and installed using Tizen Studio tools.
