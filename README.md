@@ -34,9 +34,21 @@ This repository is a TizenBrew *application module* (see `package.json`). Nothin
 2. On first launch enter the IP address of your Music Assistant server and a player name with the remote: press **OK** on a field to open the on-screen keyboard, press **Done** on the keyboard, then use **▲/▼** to move to the next field and finally select **Save**. These values are stored on the TV.
 3. Optional: in TizenBrew **Settings** -> **Autolaunch Settings** you can pick Sendspin Cinema to start automatically whenever TizenBrew is opened.
 
-**Updating / removing**
-* Updates are picked up automatically; jsDelivr caches the default branch for up to 12 hours. Don't publish GitHub releases/tags unless you want to pin a version: once a release exists, jsDelivr serves the latest release instead of the branch and caches that for up to 7 days.
-* To remove the module, select it in the **Module Manager** and confirm the prompt.
+**Updating to a new version**
+
+TizenBrew keeps no copy of the app on the TV: it fetches `package.json` and the app files from jsDelivr, so there is no "update" button. Which version you get depends on the name you added the module with:
+
+* *Automatic (`ArcoMeerkerk/sendspin-cinema-tizen`):* jsDelivr caches the default branch for up to 12 hours, so a new version shows up on its own within about 12 hours. Fully close TizenBrew and open it again afterwards. The version number on the module card (see `version` in `package.json`) tells you which version you are running.
+* *Update right now:* pin the module to the latest commit, which jsDelivr serves fresh immediately.
+  1. On GitHub open this repository's [commit list](https://github.com/ArcoMeerkerk/sendspin-cinema-tizen/commits/main) and copy the first 7 characters of the newest commit hash (for example `da2d288`).
+  2. In TizenBrew open the **Module Manager**, select **Sendspin Cinema** and confirm the prompt to remove it.
+  3. Choose **Add GitHub Module** and type `ArcoMeerkerk/sendspin-cinema-tizen@da2d288` (replace `da2d288` with the hash from step 1). Confirm the input as described above.
+  4. Go back to the home screen and launch **Sendspin Cinema**. Your Music Assistant IP and player name are kept, because they are stored by the app and not by the module entry.
+
+  A pinned module never updates by itself; repeat these steps with the new hash for the next update, or re-add the module without `@...` to follow the branch again.
+* Avoid GitHub releases/tags unless you want to pin a version: once a release exists, the name without `@...` serves the latest release instead of the branch and caches that for up to 7 days.
+
+**Removing:** select the module in the **Module Manager** and confirm the prompt.
 
 ### Option B: Standalone `.wgt`
 Because this is a custom web application, it can also be packaged and installed using Tizen Studio tools.
