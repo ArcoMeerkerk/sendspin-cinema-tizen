@@ -25,7 +25,7 @@
             }
 
             var path = location.pathname.match(/^\/module\/([^/]+)\//);
-            var repo = path && decodeURIComponent(path[1]).match(/^gh\/([^/@]+)\/([^/@]+)$/);
+            var repo = path && decodeURIComponent(path[1]).match(/^gh\/([^/@]+)\/([^/@]+)(@latest)?$/);
             if (!repo) return go(player);
 
             setTimeout(function () { go(player); }, 4000);

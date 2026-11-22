@@ -38,8 +38,8 @@ This repository is a TizenBrew *application module* (see `package.json`). Nothin
 
 There is nothing to do: `index.html` is a small launcher that asks GitHub for the newest commit every time you start the app and then loads the player from exactly that commit. Just open **Sendspin Cinema** from TizenBrew again to get the latest version. (The version number shown on the module card comes from `package.json` and can lag behind by up to 12 hours; that is cosmetic only.)
 
-* **Before the launcher existed (first time only):** if you added the module earlier than this change, your TV may still serve the old cached files for up to 12 hours. To switch immediately, remove the module and add it again once as `ArcoMeerkerk/sendspin-cinema-tizen@<first 7 characters of the newest commit hash>` (see the [commit list](https://github.com/ArcoMeerkerk/sendspin-cinema-tizen/commits/main)), or simply wait.
-* **Pinning a version:** add the module with `@<commit hash>` (or `@<tag>`) and the launcher leaves it alone; it will then never update by itself.
+* **Before the launcher existed (first time only):** if you added the module earlier than this change, your TV may still serve the old cached files for up to 12 hours. To switch immediately, remove the module in the **Module Manager** and add it again once as `ArcoMeerkerk/sendspin-cinema-tizen@latest`. That name is not cached yet, so you get the launcher right away, and it keeps auto-updating from then on. Or simply wait up to 12 hours.
+* **Pinning a version:** add the module with `@<commit hash>` or `@<tag>` and the launcher leaves it alone; it will then never update by itself (only `@latest` and no suffix auto-update).
 * **Offline / GitHub unreachable:** the launcher falls back to the files of the module itself after 4 seconds.
 * Avoid GitHub releases/tags unless you want to pin a version: once a release exists, the name without `@...` serves the latest release instead of the branch and caches that for up to 7 days.
 **Removing:** select the module in the **Module Manager** and confirm the prompt.
