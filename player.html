@@ -8,7 +8,7 @@
     <script src="Vibrant.min.js"></script>
     <style>
         :root { --accent: #0084ff; --glass: rgba(255, 255, 255, 0.1); }
-        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; cursor: none; }
+        body { --cover-size: 48vh; --controls-height: 180px; box-sizing: border-box; background: #000; color: #fff; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; cursor: none; }
         
         #bg-overlay { position: fixed; inset: -10%; background-size: cover; background-position: center; filter: blur(90px) brightness(0.2) saturate(1.2); z-index: -2; transition: background-image 1.5s ease; }
         #bg-vignette { position: fixed; inset: 0; background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,1) 120%); z-index: -1; }
@@ -21,7 +21,9 @@
         }
         #settings-trigger svg { width: 40px; height: 40px; fill: #fff; opacity: 0.7; }
 
-        .cover-wrapper { width: 48vh; height: 48vh; margin-bottom: 25px; border-radius: 20px; overflow: hidden; box-shadow: 0 40px 100px #000; border: 1px solid rgba(255,255,255,0.1); transition: all 0.6s ease; }
+        .cover-wrapper { width: var(--cover-size); height: var(--cover-size); flex: none; margin-bottom: 25px; border-radius: 20px; overflow: hidden; box-shadow: 0 40px 100px #000; border: 1px solid rgba(255,255,255,0.1); }
+        .artwork-placeholder { height: 100%; display: flex; align-items: center; justify-content: center; background: radial-gradient(ellipse at 50% 42%, #203953, #111d2d 65%, #0b1420); }
+        .artwork-placeholder svg { width: 36%; height: 36%; }
         .info { text-align: center; max-width: 85vw; z-index: 5; transition: all 0.6s ease; display: flex; flex-direction: column; align-items: center; }
         
         .progress-wrapper { width: 68vw; display: flex; align-items: center; gap: 20px; margin-bottom: 30px; opacity: 0; transform: translateY(15px); transition: all 0.5s ease; }
@@ -32,23 +34,30 @@
         .info h1, .info h2 { max-width: 100%; overflow: hidden; overflow-wrap: break-word; display: -webkit-box; -webkit-box-orient: vertical; text-shadow: 0 2px 12px #000; }
         .info h1 { font-size: 4.5rem; margin: 0; font-weight: 800; letter-spacing: -1px; line-height: 1.12; -webkit-line-clamp: 2; }
         .info h2 { color: #e2e8f0; font-size: 2.5rem; margin: 12px 0 0; font-weight: 500; -webkit-line-clamp: 1; }
+        .audio-hint { color: #b6e6ff; font-size: 1.45rem; margin: 14px 0 0; }
 
-        #controls-container { position: fixed; bottom: -200px; left: 0; width: 100%; height: 200px; display: flex; justify-content: center; align-items: center; background: linear-gradient(to top, #000, transparent); transition: bottom 0.5s ease; z-index: 100; }
+        #controls-container { position: fixed; bottom: calc(0px - var(--controls-height)); left: 0; width: 100%; height: var(--controls-height); display: flex; justify-content: center; align-items: center; background: linear-gradient(to top, #000, transparent); transition: bottom 0.5s ease; z-index: 100; }
         .btn { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); color: #fff; width: 85px; height: 85px; border-radius: 50%; margin: 0 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; font-size: 2rem; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
+        .btn svg { width: 36px; height: 36px; fill: currentColor; }
+        .btn-play { width: 110px; height: 110px; }
+        .btn-play svg { width: 45px; height: 45px; }
+        .pause-icon, .btn-play.is-playing .play-icon { display: none; }
+        .btn-play.is-playing .pause-icon { display: block; }
         .btn:hover, .btn:focus { background: #24364a; transform: scale(1.1); outline: 3px solid #fff; }
         #settings-trigger:focus { background: #24364a; outline: 3px solid #fff; }
 
-        body.show-ui { cursor: default; }
+        body.show-ui { --cover-size: 39vh; padding-bottom: var(--controls-height); cursor: default; }
         body.show-ui #controls-container { bottom: 0; }
         body.show-ui #settings-trigger { top: 0; }
         body.show-ui .progress-wrapper { opacity: 1; transform: translateY(0); }
-        body.show-ui .cover-wrapper { transform: translateY(-20px) scale(0.84); }
-        body.show-ui .info { transform: translateY(-36px); }
 
         #setup-screen { position: fixed; inset: 0; background: #070b11; z-index: 5000; display: none; flex-direction: column; justify-content: center; align-items: center; }
         .setup-panel { width: 82vw; max-width: 48rem; }
         .setup-title { margin: 0 0 28px; font-size: 3.25rem; line-height: 1.1; }
         .input-group { margin-bottom: 22px; }
+        .server-fields { display: flex; }
+        .server-fields .input-group:first-child { flex: 1; min-width: 0; margin-right: 18px; }
+        .server-fields .input-group:last-child { width: 9rem; }
         .input-group label { display: block; margin-bottom: 8px; font-size: 1.5rem; font-weight: 650; color: #f1f5f9; }
         .input-group input { box-sizing: border-box; width: 100%; background: #111b29; border: 2px solid #71839a; border-radius: 10px; color: #fff; font-family: inherit; font-size: 1.8rem; line-height: 1.25; padding: 14px 18px; }
         .input-group input:focus { border-color: #b8e1ff; outline: 2px solid #b8e1ff; outline-offset: 2px; }
@@ -56,12 +65,14 @@
         .btn-save { background: #153a5b; border: 2px solid #82bbeb; color: #fff; font-size: 1.65rem; font-weight: 650; padding: 12px 38px; border-radius: 10px; cursor: pointer; font-family: inherit; }
         .btn-save:focus { outline: 3px solid #fff; outline-offset: 3px; }
         .setup-hint { margin: 22px 0 0; color: #e2e8f0; font-size: 1.45rem; line-height: 1.45; }
+        .setup-error { color: #ffbeaf; font-size: 1.35rem; margin: 0 0 18px; }
 
         @media (max-height: 800px) {
+            body { --controls-height: 135px; }
+            body.show-ui { --cover-size: 36vh; }
             .info h1 { font-size: 3rem; }
             .info h2 { font-size: 1.8rem; }
-            #controls-container { height: 135px; }
-            body.show-ui .info { transform: translateY(-30px); }
+            .progress-wrapper { margin-bottom: 20px; }
         }
     </style>
 </head>
@@ -74,14 +85,21 @@
     <div id="setup-screen" role="dialog" aria-modal="true" aria-labelledby="setup-title">
         <div class="setup-panel">
             <h1 id="setup-title" class="setup-title" data-i18n="settings"></h1>
-            <div class="input-group">
-                <label for="server-ip" data-i18n="serverIp"></label>
-                <input type="text" id="server-ip" placeholder="192.168.1.20" spellcheck="false">
+            <div class="server-fields">
+                <div class="input-group">
+                    <label for="server-ip" data-i18n="serverIp"></label>
+                    <input type="text" id="server-ip" placeholder="192.168.1.20" spellcheck="false">
+                </div>
+                <div class="input-group">
+                    <label for="server-port" data-i18n="serverPort"></label>
+                    <input type="text" id="server-port" inputmode="numeric" placeholder="8927" maxlength="5">
+                </div>
             </div>
             <div class="input-group">
                 <label for="player-name" data-i18n="playerName"></label>
                 <input type="text" id="player-name" placeholder="Sendspin Cinema">
             </div>
+            <p id="setup-error" class="setup-error" role="alert" hidden></p>
             <button type="button" class="btn-save" id="save-btn" data-i18n="save"></button>
             <p class="setup-hint" data-i18n="hint"></p>
         </div>
@@ -91,7 +109,12 @@
     <div id="bg-vignette"></div>
 
     <div class="cover-wrapper">
-        <div id="loader" style="font-size: 5rem; display: flex; justify-content: center; align-items: center; height: 100%;">💿</div>
+        <div id="loader" class="artwork-placeholder" aria-hidden="true">
+            <svg viewBox="0 0 104 104" fill="none">
+                <circle cx="52" cy="52" r="48" fill="#13263b" stroke="#456987" stroke-width="2"/>
+                <path d="M25 47v10m13-20v30m14-41v52m14-41v30m13-20v10" stroke="#b6e6ff" stroke-width="6" stroke-linecap="round"/>
+            </svg>
+        </div>
         <img id="cover-art" alt="" style="width:100%; height:100%; object-fit:cover; display:none;" crossorigin="anonymous">
     </div>
 
@@ -103,12 +126,16 @@
         </div>
         <h1 id="title" data-i18n="loading"></h1>
         <h2 id="artist">Music Assistant</h2>
+        <p class="audio-hint" id="audio-hint" data-i18n="enableSound" role="status" hidden></p>
     </div>
 
     <div id="controls-container">
-        <button class="btn" id="prev-btn" data-i18n-label="previous">⏮</button>
-        <button class="btn btn-play" id="play-btn" data-i18n-label="play" style="width:110px; height:110px; font-size:3rem;">▶</button>
-        <button class="btn" id="next-btn" data-i18n-label="next">⏭</button>
+        <button class="btn" id="prev-btn" data-i18n-label="previous"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h2v14H5zM19 5v14L8.5 12z"/></svg></button>
+        <button class="btn btn-play" id="play-btn" data-i18n-label="play">
+            <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4.8a.8.8 0 0 1 1.22-.68l11.1 7.2a.8.8 0 0 1 0 1.36l-11.1 7.2A.8.8 0 0 1 8 19.2z"/></svg>
+            <svg class="pause-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+        </button>
+        <button class="btn" id="next-btn" data-i18n-label="next"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 5h2v14h-2zM5 5l10.5 7L5 19z"/></svg></button>
     </div>
 
     <script type="module">
@@ -117,37 +144,49 @@
         const I18N = {
             en: {
                 loading: 'Connecting to Music Assistant…', ready: 'Ready', settings: 'Settings',
-                serverIp: 'Music Assistant IP address', playerName: 'Player name', save: 'Save',
+                serverIp: 'Music Assistant IP address', serverPort: 'Port', playerName: 'Player name', save: 'Save',
+                invalidAddress: 'Enter a valid address and a port from 1 to 65535.',
+                enableSound: 'Press OK to turn on sound.',
                 hint: 'Press OK to type. Choose Done on the keyboard and then select Save.',
                 previous: 'Previous track', play: 'Play', pause: 'Pause', next: 'Next track'
             },
             nl: {
                 loading: 'Verbinden met Music Assistant…', ready: 'Klaar', settings: 'Instellingen',
-                serverIp: 'IP-adres van Music Assistant', playerName: 'Spelernaam', save: 'Opslaan',
+                serverIp: 'IP-adres van Music Assistant', serverPort: 'Poort', playerName: 'Spelernaam', save: 'Opslaan',
+                invalidAddress: 'Vul een geldig adres en een poort tussen 1 en 65535 in.',
+                enableSound: 'Druk op OK om geluid in te schakelen.',
                 hint: 'Druk op OK om te typen. Kies Gereed op het toetsenbord en daarna Opslaan.',
                 previous: 'Vorig nummer', play: 'Afspelen', pause: 'Pauzeren', next: 'Volgend nummer'
             },
             de: {
                 loading: 'Verbindung mit Music Assistant wird hergestellt…', ready: 'Bereit', settings: 'Einstellungen',
-                serverIp: 'IP-Adresse von Music Assistant', playerName: 'Playername', save: 'Speichern',
+                serverIp: 'IP-Adresse von Music Assistant', serverPort: 'Port', playerName: 'Playername', save: 'Speichern',
+                invalidAddress: 'Gib eine gültige Adresse und einen Port zwischen 1 und 65535 ein.',
+                enableSound: 'Drücke OK, um den Ton einzuschalten.',
                 hint: 'Drücke zur Eingabe auf OK. Wähle auf der Tastatur Fertig und dann Speichern.',
                 previous: 'Vorheriger Titel', play: 'Wiedergabe', pause: 'Pause', next: 'Nächster Titel'
             },
             fr: {
                 loading: 'Connexion à Music Assistant…', ready: 'Prêt', settings: 'Paramètres',
-                serverIp: 'Adresse IP de Music Assistant', playerName: 'Nom du lecteur', save: 'Enregistrer',
+                serverIp: 'Adresse IP de Music Assistant', serverPort: 'Port', playerName: 'Nom du lecteur', save: 'Enregistrer',
+                invalidAddress: 'Saisissez une adresse valide et un port compris entre 1 et 65535.',
+                enableSound: 'Appuyez sur OK pour activer le son.',
                 hint: 'Appuyez sur OK pour saisir. Choisissez Terminé sur le clavier, puis Enregistrer.',
                 previous: 'Piste précédente', play: 'Lire', pause: 'Mettre en pause', next: 'Piste suivante'
             },
             es: {
                 loading: 'Conectando con Music Assistant…', ready: 'Listo', settings: 'Ajustes',
-                serverIp: 'Dirección IP de Music Assistant', playerName: 'Nombre del reproductor', save: 'Guardar',
+                serverIp: 'Dirección IP de Music Assistant', serverPort: 'Puerto', playerName: 'Nombre del reproductor', save: 'Guardar',
+                invalidAddress: 'Introduce una dirección válida y un puerto entre 1 y 65535.',
+                enableSound: 'Pulsa OK para activar el sonido.',
                 hint: 'Pulsa OK para escribir. Selecciona Listo en el teclado y después Guardar.',
                 previous: 'Pista anterior', play: 'Reproducir', pause: 'Pausar', next: 'Pista siguiente'
             },
             sr: {
                 loading: 'Povezivanje sa Music Assistant-om…', ready: 'Spreman', settings: 'Podešavanja',
-                serverIp: 'IP adresa za Music Assistant', playerName: 'Ime plejera', save: 'Sačuvaj',
+                serverIp: 'IP adresa za Music Assistant', serverPort: 'Port', playerName: 'Ime plejera', save: 'Sačuvaj',
+                invalidAddress: 'Unesi ispravnu adresu i port između 1 i 65535.',
+                enableSound: 'Pritisni OK da uključiš zvuk.',
                 hint: 'Pritisni OK za unos. Na tastaturi izaberi Gotovo, a zatim Sačuvaj.',
                 previous: 'Prethodna numera', play: 'Pusti', pause: 'Pauziraj', next: 'Sledeća numera'
             }
@@ -164,21 +203,26 @@
         const REMOTE_KEYS = { 13: 'Enter', 37: 'ArrowLeft', 38: 'ArrowUp', 39: 'ArrowRight', 40: 'ArrowDown' };
         const MEDIA_COMMANDS = { 415: 'play', 19: 'pause', 10252: 'playpause', 10233: 'next', 10232: 'previous' };
         const DEFAULT_PLAYER_NAME = 'Sendspin Cinema';
+        const DEFAULT_SERVER_PORT = 8927;
 
         const setupScreen = document.getElementById('setup-screen');
+        const setupError = document.getElementById('setup-error');
         const ipInput = document.getElementById('server-ip');
+        const portInput = document.getElementById('server-port');
         const nameInput = document.getElementById('player-name');
         const saveBtn = document.getElementById('save-btn');
         const settingsBtn = document.getElementById('settings-trigger');
         const prevBtn = document.getElementById('prev-btn');
         const playBtn = document.getElementById('play-btn');
         const nextBtn = document.getElementById('next-btn');
-        const setupFields = [ipInput, nameInput, saveBtn];
+        const setupFields = [ipInput, portInput, nameInput, saveBtn];
         const controlRow = [prevBtn, playBtn, nextBtn];
 
         const titleEl = document.getElementById('title');
         const artistEl = document.getElementById('artist');
+        const audioHint = document.getElementById('audio-hint');
         const coverEl = document.getElementById('cover-art');
+        const artworkPlaceholder = document.getElementById('loader');
         const bgEl = document.getElementById('bg-overlay');
         const progressBar = document.getElementById('progress-bar');
         const timeCurrent = document.getElementById('time-current');
@@ -206,10 +250,53 @@
             };
         }
 
+        function showArtworkPlaceholder() {
+            coverEl.style.display = 'none';
+            artworkPlaceholder.style.display = 'flex';
+            bgEl.style.backgroundImage = '';
+            document.documentElement.style.removeProperty('--accent');
+        }
+
+        function updateArtwork(url) {
+            if ((coverEl.getAttribute('src') || '') === (url || '')) return;
+            showArtworkPlaceholder();
+            if (url) coverEl.src = url;
+            else coverEl.removeAttribute('src');
+        }
+
+        coverEl.onload = () => {
+            coverEl.style.display = 'block';
+            artworkPlaceholder.style.display = 'none';
+            bgEl.style.backgroundImage = 'url(' + JSON.stringify(coverEl.src) + ')';
+            updateTheme(coverEl.src);
+        };
+        coverEl.onerror = showArtworkPlaceholder;
+
+        function parseServerAddress(address, port) {
+            const match = /^(\[[^\]]+\]|[^:[\]/\\?#@\s]+)(?::(\d+))?$/.exec(address.trim());
+            if (!match) return null;
+            const portText = port.trim() || match[2] || String(DEFAULT_SERVER_PORT);
+            const portNumber = Number(portText);
+            if (!/^\d{1,5}$/.test(portText) || portNumber < 1 || portNumber > 65535) return null;
+            try {
+                const host = new URL('http://' + match[1]).hostname;
+                return { host, port: portNumber };
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function savedServerAddress() {
+            return parseServerAddress(localStorage.getItem('ma_server_ip') || '', localStorage.getItem('ma_server_port') || '');
+        }
+
         window.openSettings = () => {
             setupScreen.style.display = 'flex';
-            ipInput.value = localStorage.getItem('ma_server_ip') || '';
+            const endpoint = savedServerAddress();
+            ipInput.value = endpoint ? endpoint.host : (localStorage.getItem('ma_server_ip') || '');
+            portInput.value = endpoint && endpoint.port !== DEFAULT_SERVER_PORT ? String(endpoint.port) : '';
             nameInput.value = localStorage.getItem('ma_player_name') || '';
+            setupError.hidden = true;
             ipInput.focus();
         };
 
@@ -219,55 +306,73 @@
         }
 
         window.saveConfig = () => {
-            const ip = ipInput.value.trim();
+            const endpoint = parseServerAddress(ipInput.value, portInput.value);
             const name = nameInput.value.trim() || DEFAULT_PLAYER_NAME;
-            if (ip) { 
-                localStorage.setItem('ma_server_ip', ip); 
-                localStorage.setItem('ma_player_name', name);
-                location.reload(); 
+            if (!endpoint) {
+                setupError.textContent = t('invalidAddress');
+                setupError.hidden = false;
+                return;
             }
+            localStorage.setItem('ma_server_ip', endpoint.host);
+            localStorage.setItem('ma_server_port', String(endpoint.port));
+            localStorage.setItem('ma_player_name', name);
+            location.reload();
         };
 
         async function init() {
-            const savedIp = localStorage.getItem('ma_server_ip');
+            const endpoint = savedServerAddress();
             const savedName = localStorage.getItem('ma_player_name');
             
-            if (!savedIp) { window.openSettings(); return; }
+            if (!endpoint) { window.openSettings(); return; }
 
             // Generiše bezbedan ID za server (npr. Dnevna Soba -> webos-dnevna-soba)
             const safePlayerId = 'webos-' + (savedName || 'lg-cinema').toLowerCase().replace(/[^a-z0-9]/g, '-');
 
             window.playerInstance = new SendspinPlayer({
                 playerId: safePlayerId,
-                baseUrl: `http://${savedIp}:8927`,
+                baseUrl: `http://${endpoint.host}:${endpoint.port}`,
                 clientName: savedName || DEFAULT_PLAYER_NAME,
+                onConnectionChange: (connected) => {
+                    titleEl.textContent = t(connected ? 'ready' : 'loading');
+                    if (!connected) audioHint.hidden = true;
+                },
                 onStateChange: (state) => {
+                    updateAudioHint();
                     if (state.serverState?.metadata) {
                         const m = state.serverState.metadata;
                         titleEl.innerText = m.title || t('ready');
                         artistEl.innerText = m.artist || "Music Assistant";
                         const art = m.artwork_url || m.art || m.image;
-                        if (art && coverEl.src !== art) {
-                            coverEl.src = art; bgEl.style.backgroundImage = `url('${art}')`;
-                            coverEl.style.display = 'block'; document.getElementById('loader').style.display = 'none';
-                            updateTheme(art);
-                        }
+                        updateArtwork(art);
                         if (m.progress) {
                             duration = m.progress.track_duration;
                             currentPos = m.progress.track_progress;
                             timeTotal.innerText = formatTime(duration);
-                            progressBar.style.width = (currentPos / duration * 100) + '%';
+                            progressBar.style.width = (duration > 0 ? Math.min(100, currentPos / duration * 100) : 0) + '%';
                             timeCurrent.innerText = formatTime(currentPos);
                         }
                     }
-                    if (state.groupState) {
-                        isPlaying = state.groupState.playback_state === 'playing';
-                        playBtn.innerText = isPlaying ? '⏸' : '▶';
-                        playBtn.setAttribute('aria-label', t(isPlaying ? 'pause' : 'play'));
-                    }
+                    const playbackState = state.groupState?.playback_state;
+                    isPlaying = playbackState ? playbackState === 'playing' : window.playerInstance?.isPlaying;
+                    playBtn.classList.toggle('is-playing', isPlaying);
+                    playBtn.setAttribute('aria-label', t(isPlaying ? 'pause' : 'play'));
                 }
             });
-            await window.playerInstance.connect();
+            await window.playerInstance.connect().catch(() => {
+                // The WebSocket manager retries; preserve the connecting state.
+            });
+        }
+
+        function updateAudioHint() {
+            audioHint.hidden = !window.playerInstance?.audioNeedsActivation;
+        }
+
+        function enableSound() {
+            const player = window.playerInstance;
+            if (!player) return;
+            player.enableAudio().then(updateAudioHint).catch(error => {
+                console.warn('Sendspin: Could not enable sound', error);
+            });
         }
 
         function showUI() {
@@ -293,7 +398,7 @@
             } else if (key === 'Enter' && document.activeElement === saveBtn) {
                 e.preventDefault();
                 window.saveConfig();
-            } else if ((e.keyCode === KEY_BACK || key === 'Escape') && localStorage.getItem('ma_server_ip')) {
+            } else if ((e.keyCode === KEY_BACK || key === 'Escape') && savedServerAddress()) {
                 closeSettings();
             }
         }
@@ -311,6 +416,11 @@
             }
 
             const active = document.activeElement;
+            if (key === 'Enter' && window.playerInstance?.audioNeedsActivation && (active === playBtn || active === body)) {
+                e.preventDefault();
+                playBtn.focus();
+                return;
+            }
             const row = controlRow.indexOf(active);
             if (wasHidden && row === -1 && active !== settingsBtn) {
                 playBtn.focus();
@@ -331,11 +441,19 @@
         window.addEventListener('keydown', (e) => {
             const key = e.key && e.key !== 'Unidentified' ? e.key : REMOTE_KEYS[e.keyCode];
             if (setupScreen.style.display === 'flex') onSetupKey(e, key);
-            else onPlayerKey(e, key);
+            else {
+                onPlayerKey(e, key);
+                if (key === 'Enter' || MEDIA_COMMANDS[e.keyCode]) enableSound();
+            }
+        });
+        window.addEventListener('click', () => {
+            if (setupScreen.style.display !== 'flex') enableSound();
         });
         window.addEventListener('mousemove', showUI);
         saveBtn.onclick = () => window.saveConfig();
-        document.getElementById('play-btn').onclick = () => window.playerInstance?.sendCommand(isPlaying ? 'pause' : 'play');
+        playBtn.onclick = () => {
+            if (!window.playerInstance?.audioNeedsActivation) window.playerInstance?.sendCommand(isPlaying ? 'pause' : 'play');
+        };
         document.getElementById('prev-btn').onclick = () => window.playerInstance?.sendCommand('previous');
         document.getElementById('next-btn').onclick = () => window.playerInstance?.sendCommand('next');
 

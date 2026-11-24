@@ -2916,6 +2916,7 @@ class SendspinPlayer {
         () => {
             console.log("Sendspin: Using player_id:", this.config.playerId);
             this.protocolHandler.sendClientHello();
+            this.config.onConnectionChange?.(true);
         }, 
         // onMessage
         (event) => {
@@ -2929,7 +2930,17 @@ class SendspinPlayer {
         () => {
             this.protocolHandler.stopTimeSync();
             console.log("Sendspin: Connection closed");
+            this.config.onConnectionChange?.(false);
         });
+    }
+    // Call from a user interaction when browser autoplay requires activation.
+    async enableAudio() {
+        this.audioProcessor.initAudioContext();
+        this.audioProcessor.startAudioElement();
+        await this.audioProcessor.resumeAudioContext();
+    }
+    get audioNeedsActivation() {
+        return this.currentFormat !== null && this.audioProcessor.getAudioContext()?.state === "suspended";
     }
     /**
      * Disconnect from Sendspin server

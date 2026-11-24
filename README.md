@@ -31,7 +31,7 @@ This repository is a TizenBrew *application module* (see `package.json`). Nothin
 
 **3. Launch it**
 1. Go back to the TizenBrew home screen (house icon) and select **Sendspin Cinema**.
-2. On first launch enter the IP address of your Music Assistant server and a player name with the remote: press **OK** on a field to open the on-screen keyboard, press **Done** on the keyboard, then use **▲/▼** to move to the next field and finally select **Save**. These values are stored on the TV.
+2. On first launch enter the address of your Music Assistant server and a player name. Leave **Port** blank to use the default Sendspin port, **8927**, or enter a custom port. You can also enter an address such as `192.168.1.20:18927` with the **Port** field blank. Use **OK** to open the keyboard, **Done** to finish entering text, and **▲/▼** to move between fields. Select **Save** to store the settings on the TV.
 3. Optional: in TizenBrew **Settings** -> **Autolaunch Settings** you can pick Sendspin Cinema to start automatically whenever TizenBrew is opened.
 
 **Updating to a new version**
@@ -57,6 +57,8 @@ When you first launch the app, Music Assistant may hide the new player by defaul
 2. Go to **Settings** -> **Players**.
 3. Find your newly registered TV (check Disabled/Hidden lists).
 4. Uncheck **"Hide this player in the user interface"**.
+
+Select **Sendspin Cinema** or the player name you configured as the playback device in Music Assistant. If the TV shows a prompt to enable sound, press **OK** on the TV remote.
 
 ## ☕ Support the Project
 If this app made your home theater experience better, consider buying me a coffee! 
